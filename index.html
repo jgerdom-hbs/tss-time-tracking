@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>TSS Time Tracking</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <h1>Time Tracking</h1>
+    <span class="unit">HBS Technology Support Services</span>
+    <span class="who" id="who" hidden>
+      <span id="whoName"></span>
+      <button type="button" id="signOut">Not you?</button>
+    </span>
+  </div>
+</header>
+
+<!-- ── PIN gate ──────────────────────────────────────────────────────────── -->
+<main id="gateView">
+  <div class="card gate">
+    <h2>Enter your PIN</h2>
+    <p class="subhead">Six digits, issued to you by your supervisor.</p>
+    <form id="pinForm">
+      <input id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*"
+             maxlength="6" autocomplete="off" aria-label="Six-digit PIN" placeholder="••••••">
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+    <p class="status err" id="pinError" hidden></p>
+  </div>
+</main>
+
+<!-- ── Signed in ─────────────────────────────────────────────────────────── -->
+<main id="appView" hidden>
+
+  <div class="demo-banner" id="demoBanner" hidden>
+    <strong>Demo mode.</strong> No flow URL is configured, so this page is showing
+    made-up data and saving to your browser only. Nothing reaches SharePoint.
+    Add your flow URL to <code>config.js</code> to go live.
+  </div>
+
+  <nav class="steps" id="steps" aria-label="Progress">
+    <button type="button" data-step="1" aria-current="step"><b>1</b> Hours</button>
+    <button type="button" data-step="2"><b>2</b> Appointments</button>
+    <button type="button" data-step="3"><b>3</b> Data</button>
+  </nav>
+
+  <!-- Step 1 -->
+  <section class="card step" id="sec1">
+    <h2>Today's Hours</h2>
+    <p class="subhead">How your working day was spent.</p>
+
+    <div class="helper">
+      <p><strong>Split your day across these six categories.</strong> Don't count time in
+      more than one category. If the work happened on campus but didn't need to, it belongs
+      under <em>Remote or could have been remote</em>.</p>
+      <p><strong>Appointments</strong> are with a user, working their support ticket.
+      <strong>Meetings</strong> are internal business meetings.</p>
+    </div>
+
+    <div class="field" style="margin-bottom:1rem">
+      <label for="hoursDate">Date</label>
+      <input type="date" id="hoursDate">
+      <span class="status" id="hoursLoaded"></span>
+    </div>
+
+    <div id="hoursGroups"></div>
+
+    <div class="daytotal">
+      <span class="lbl">Day total</span>
+      <span class="val" id="dayTotal">0.00</span>
+    </div>
+    <p class="warn" id="hoursWarn" hidden></p>
+
+    <div class="field" style="margin-top:1rem">
+      <label for="hoursNotes" style="align-self:flex-start">Notes <span style="color:var(--ink-muted)">(optional)</span></label>
+    </div>
+    <textarea id="hoursNotes" rows="2" placeholder="Anything worth noting about today"></textarea>
+
+    <div class="actions">
+      <button class="btn" id="saveHours" type="button">Save and continue</button>
+      <span class="status" id="hoursStatus"></span>
+    </div>
+    <p class="skip"><button type="button" class="linkish" data-goto="2">Skip to appointments</button></p>
+  </section>
+
+  <!-- Step 2 -->
+  <section class="card step" id="sec2" hidden>
+    <h2>Today's Appointments</h2>
+    <p class="subhead">Meetings with a user to work their support ticket.</p>
+
+    <div class="helper">
+      <p><strong>Count only appointments with a user to work their support ticket.</strong>
+      Internal meetings don't belong here — record those as hours in Step 1. For each
+      appointment, count from when the ticket was <strong>assigned to you</strong> — not when
+      the user submitted it — to today's appointment.</p>
+      <p><strong>In person</strong> means you went to the user.
+      <strong>Remote</strong> means you handled it from your desk, including remote desktop sessions.</p>
+    </div>
+
+    <div class="field" style="margin-bottom:1rem">
+      <label for="apptDate">Date</label>
+      <input type="date" id="apptDate">
+      <span class="status" id="apptLoaded"></span>
+    </div>
+
+    <div class="grid-wrap">
+      <table class="tally">
+        <thead><tr id="apptHead"><th scope="col">Ticket assigned</th></tr></thead>
+        <tbody id="apptBody"></tbody>
+      </table>
+    </div>
+
+    <div class="daytotal">
+      <span class="lbl">Appointments today</span>
+      <span class="val" id="apptTotal">0</span>
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" type="button" data-goto="1">Back</button>
+      <button class="btn" id="saveAppts" type="button">Save and continue</button>
+      <span class="status" id="apptStatus"></span>
+    </div>
+    <p class="skip"><button type="button" class="linkish" data-goto="3">Skip to the data</button></p>
+  </section>
+
+  <!-- Step 3 -->
+  <section class="card step" id="sec3" hidden>
+    <h2>The Data</h2>
+    <p class="subhead">Your own entries, and how the team adds up.</p>
+
+    <div class="toolbar">
+      <div class="segmented" role="group" aria-label="Whose data">
+        <button type="button" id="scopeMine" aria-pressed="true">Mine</button>
+        <button type="button" id="scopeTeam" aria-pressed="false">Team</button>
+      </div>
+      <div class="segmented" role="group" aria-label="Date range">
+        <button type="button" class="range" data-days="7"  aria-pressed="false">7 days</button>
+        <button type="button" class="range" data-days="30" aria-pressed="true">30 days</button>
+        <button type="button" class="range" data-days="90" aria-pressed="false">90 days</button>
+      </div>
+      <button class="btn secondary" id="downloadCsv" type="button">Download CSV</button>
+    </div>
+
+    <div id="dataBody"></div>
+    <div class="notice" id="dataEmpty" hidden></div>
+
+    <div class="actions">
+      <button class="btn secondary" type="button" data-goto="1">Back to today's entry</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span>HBS Technology Support Services</span>
+  <button type="button" id="themeToggle">Toggle light / dark</button>
+</footer>
+
+<script src="config.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
