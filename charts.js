@@ -68,8 +68,11 @@
     container.textContent = '';
     if (!weeks.length) return;
 
-    const W = 720, H = 240;
-    const padL = 46, padR = 12, padT = 16, padB = 34;
+    /* padB carries the tick labels plus the "Week of" caption below them, and H
+       grew by the same 14px the caption needs — so plotH is unchanged and the
+       bars sit exactly where they did before the caption existed. */
+    const W = 720, H = 254;
+    const padL = 46, padR = 12, padT = 16, padB = 48;
     const plotW = W - padL - padR, plotH = H - padT - padB;
 
     const totals = weeks.map(w => groups.reduce((s, g) => s + (w.values[g] || 0), 0));
@@ -131,6 +134,16 @@
     svg.appendChild(el('line',
       { x1: padL, x2: W - padR, y1: padT + plotH, y2: padT + plotH },
       'stroke:var(--rule);stroke-width:1'));
+
+    /* One caption for the whole axis, not a prefix on every tick: the labels are
+       week-start Mondays, and a bare "Aug 3" reads as a date somebody logged
+       hours on — which is exactly the wrong reading, since nobody logged on the
+       Mondays in the sample. Same size, fill and family as the tick labels. */
+    const axisNote = el('text',
+      { x: padL + plotW / 2, y: H - padB + 30, 'text-anchor': 'middle' },
+      'font-size:10px;fill:var(--ink-muted)');
+    axisNote.textContent = 'Week of';
+    svg.appendChild(axisNote);
 
     container.appendChild(svg);
   }
