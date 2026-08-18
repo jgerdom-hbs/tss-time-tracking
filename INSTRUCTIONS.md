@@ -28,14 +28,14 @@ Select the date then think about each of your user appointments. They will eithe
 
 * **Day 0:** The ticket was assigned to you on a Thursday, and you reached out the same day.
 * **Day 1:** The following day, the user asked if you could meet via Zoom on Tuesday.
-* **Day 2:** *No action taken*
+* **Day 2:** *No action taken on Monday*
 * **Day 3:** You resolve the user's issue via Zoom on Tuesday.
 * **Day 3:** At the end of Tuesday, add 1 to the **Three to four days** field in the **Remote** column.
 
 ### 3 - Data
 Toggle between your data and the team's aggregate data.
 
-Note: Team data updates each night at 1 a.m. unless Jason manually triggers the flow to compile team data.
+*Note: Team data updates each night at 1 a.m. unless Jason manually triggers the flow to compile team data.*
 
 ## The URL
 https://jgerdom-hbs.github.io/tss-time-tracking/
