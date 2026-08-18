@@ -638,8 +638,9 @@
     if (totalH > 0) {
       const hero = document.createElement('div');
       hero.className = 'hero';
+      const remPct = Math.round((rem / totalH) * 100);
       hero.innerHTML =
-        `<div class="figure">${Math.round((rem / totalH) * 100)}%</div>` +
+        `<div class="figure" style="${heroTint(remPct)}">${remPct}%</div>` +
         `<div class="caption">of working hours could have been done remotely</div>` +
         `<div class="detail">${rem.toFixed(1)} of ${totalH.toFixed(1)} hours</div>`;
       hoursSec.appendChild(hero);
@@ -648,16 +649,20 @@
       const weekKeys = Object.keys(vm.weeks).sort();
       if (weekKeys.length) {
         hoursSec.appendChild(title('Hours per week'));
+        /* Crimson goes to the remote segment, not the on-campus one: it is both
+           the larger share and the finding the hero figure states, so the two
+           have to agree in colour. */
         hoursSec.appendChild(legend([
-          [gOnCampus, 'var(--series-1)'],
-          [gRemote, 'var(--series-2)'],
+          [gOnCampus, 'var(--series-2)'],
+          [gRemote, 'var(--series-1)'],
         ]));
         const c = document.createElement('div');
         c.className = 'chart';
         hoursSec.appendChild(c);
         Charts.stackedWeeks(c,
           weekKeys.map(k => ({ label: shortLabel(k), values: vm.weeks[k] })),
-          [gOnCampus, gRemote]);
+          [gOnCampus, gRemote],
+          ['--series-2', '--series-1']);
       }
 
       /* Breakdown table — the detail behind the hero, so it stays in this bucket. */
@@ -688,7 +693,7 @@
       h.className = 'hero';
       h.innerHTML =
         (ip
-          ? `<div class="figure">${ip.pct}%</div>` +
+          ? `<div class="figure" style="${heroTint(ip.pct)}">${ip.pct}%</div>` +
             `<div class="caption">of ${adj(inPersonMode)} appointments did not require ` +
             `same-day assistance</div>` +
             `<div class="detail">${ip.later} of ${ip.total} ${plural(ip.total)}</div>`
@@ -707,7 +712,10 @@
       apptSec.appendChild(title('How long the ticket had been assigned'));
       const panels = document.createElement('div');
       panels.className = 'panels';
-      [[inPersonMode, ipRows], [remoteMode, rmRows]].forEach(([mode, rows]) => {
+      /* Each panel takes its mode's hue — teal in person, crimson remote — so a
+         reader never has to check the heading to know which panel they are in. */
+      [[inPersonMode, ipRows, '--lagteal'], [remoteMode, rmRows, '--lag']]
+        .forEach(([mode, rows, ramp]) => {
         const p = document.createElement('div');
         p.className = 'panel';
         const h = document.createElement('h4');
@@ -719,7 +727,7 @@
         c.className = 'chart';
         p.append(h, n, c);
         panels.appendChild(p);
-        Charts.lagPanel(c, rows, CUT_AFTER);
+        Charts.lagPanel(c, rows, CUT_AFTER, ramp);
       });
       apptSec.appendChild(panels);
 
@@ -729,8 +737,10 @@
       mc.className = 'chart';
       apptSec.appendChild(mc);
       Charts.proportionBar(mc, [
-        { label: inPersonMode, value: sumCounts(ipRows), cssVar: '--series-1' },
-        { label: remoteMode, value: sumCounts(rmRows), cssVar: '--series-2' },
+        /* Same pairing as the hours chart above — remote crimson, on campus
+           teal — so one colour means one thing across the whole tab. */
+        { label: inPersonMode, value: sumCounts(ipRows), cssVar: '--series-2' },
+        { label: remoteMode, value: sumCounts(rmRows), cssVar: '--series-1' },
       ]);
     }
 
@@ -765,6 +775,35 @@
     h.className = 'chart-title';
     h.textContent = text;
     return h;
+  }
+
+  /* Diverging tint for a hero figure: the number's own value places it on a
+     teal → white → crimson scale, so a glance at the colour says which way the
+     finding leans before the caption is read. The outline runs teal → black →
+     crimson on the same axis, which is what keeps the midpoint legible — a
+     white fill alone would vanish into the surface at 50%.
+
+     Both ends stay as var(--series-N) rather than resolved hex, so the figure
+     re-tints itself on a light/dark switch with no re-render, the same contract
+     the SVG charts hold. The plain `color` ahead of each color-mix() is the
+     fallback for browsers without it: an invalid declaration is dropped and the
+     earlier one stands, so the figure lands on its nearer end instead of
+     inheriting nothing. */
+  function heroTint(value) {
+    const t = Math.max(0, Math.min(100, value)) / 100;
+    const near = t <= 0.5 ? 'var(--series-2)' : 'var(--series-1)';
+    let fill, line;
+    if (t <= 0.5) {
+      const m = (t / 0.5) * 100;   // 0 = teal, 100 = white / black
+      fill = `color-mix(in srgb, #fff ${m}%, var(--series-2))`;
+      line = `color-mix(in srgb, #000 ${m}%, var(--series-2))`;
+    } else {
+      const m = ((t - 0.5) / 0.5) * 100;   // 0 = white / black, 100 = crimson
+      fill = `color-mix(in srgb, var(--series-1) ${m}%, #fff)`;
+      line = `color-mix(in srgb, var(--series-1) ${m}%, #000)`;
+    }
+    return `color:${near};color:${fill};` +
+      `-webkit-text-stroke:1px ${near};-webkit-text-stroke:1px ${line}`;
   }
   /* h3 sits between the section's h2 ("The Data") and the panel h4s, so the
      heading order stays walkable. Labels match the step nav wording exactly. */

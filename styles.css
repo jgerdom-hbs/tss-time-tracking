@@ -19,13 +19,23 @@
   --series-1:       #a41034;
   --series-2:       #00979d;
 
-  /* Ordinal ramp, Immediately → Five or more days. */
-  --lag-1: #fe949b;   /* Immediately        — lightest */
-  --lag-2: #eb6a76;   /* Same day */
-  --lag-3: #c94c5a;   /* Next day */
-  --lag-4: #a82c40;   /* Two days */
-  --lag-5: #870127;   /* Three to four days */
-  --lag-6: #5b0017;   /* Five or more days  — darkest */
+  /* Ordinal ramp, Immediately → Five or more days. Darkest at the top: the
+     shortest waits are the urgent ones, so they carry the heaviest colour. */
+  --lag-1: #5b0017;   /* Immediately        — darkest */
+  --lag-2: #870127;   /* Same day */
+  --lag-3: #a82c40;   /* Next day */
+  --lag-4: #c94c5a;   /* Two days */
+  --lag-5: #eb6a76;   /* Three to four days */
+  --lag-6: #fe949b;   /* Five or more days  — lightest */
+
+  /* Teal ramp, same ordering, for the in-person panel. Anchored on the brand
+     teal #00979d so the panel reads as the teal in-person series elsewhere. */
+  --lagteal-1: #00565a;   /* Immediately        — darkest */
+  --lagteal-2: #00767b;   /* Same day */
+  --lagteal-3: #00979d;   /* Next day */
+  --lagteal-4: #2aa7ad;   /* Two days */
+  --lagteal-5: #5cbfc4;   /* Three to four days */
+  --lagteal-6: #8fd7da;   /* Five or more days  — lightest */
 
   --danger:         #d03b3b;
   --shadow:         0 1px 2px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.05);
@@ -47,11 +57,13 @@
     --crimson-ink: #e2647d;
     --series-1:  #d33851;
     --series-2:  #00979d;
-    /* Validated ramp is #fec8c9 → #9d2037 (light → dark); applied REVERSED here.
-       On a dark surface prominence comes from lightness, so the longest wait
-       must be the lightest step or the headline bar would recede. */
-    --lag-1: #9d2037; --lag-2: #ba3d4e; --lag-3: #d75866;
-    --lag-4: #f5737f; --lag-5: #ff9ca2; --lag-6: #fec8c9;
+    /* Validated ramp is #fec8c9 → #9d2037 (light → dark). On a dark surface
+       prominence comes from lightness, so the urgent short waits take the
+       lightest steps here — the mirror of the light-theme ordering. */
+    --lag-1: #fec8c9; --lag-2: #ff9ca2; --lag-3: #f5737f;
+    --lag-4: #d75866; --lag-5: #ba3d4e; --lag-6: #9d2037;
+    --lagteal-1: #c2eaec; --lagteal-2: #97dcdf; --lagteal-3: #6bcbcf;
+    --lagteal-4: #3fb4b9; --lagteal-5: #14989e; --lagteal-6: #0b6f74;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.3);
   }
 }
@@ -68,9 +80,11 @@
   --crimson-ink: #e2647d;
   --series-1:  #d33851;
   --series-2:  #00979d;
-  /* Reversed, same reasoning as the media-query block above. */
-  --lag-1: #9d2037; --lag-2: #ba3d4e; --lag-3: #d75866;
-  --lag-4: #f5737f; --lag-5: #ff9ca2; --lag-6: #fec8c9;
+  /* Lightest at the top, same reasoning as the media-query block above. */
+  --lag-1: #fec8c9; --lag-2: #ff9ca2; --lag-3: #f5737f;
+  --lag-4: #d75866; --lag-5: #ba3d4e; --lag-6: #9d2037;
+  --lagteal-1: #c2eaec; --lagteal-2: #97dcdf; --lagteal-3: #6bcbcf;
+  --lagteal-4: #3fb4b9; --lagteal-5: #14989e; --lagteal-6: #0b6f74;
   --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.3);
 }
 

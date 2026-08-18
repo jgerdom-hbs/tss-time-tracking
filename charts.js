@@ -63,8 +63,10 @@
   }
 
   /* ── 1. Stacked bars: hours per week, by group ─────────────────────────── */
-  /* weeks: [{ label, values: { groupName: hours } }]  groups: [name, name] */
-  function stackedWeeks(container, weeks, groups) {
+  /* weeks: [{ label, values: { groupName: hours } }]  groups: [name, name]
+     vars: optional CSS custom-property name per group, same order as groups.
+     The caller owns the mapping so the legend and the bars cannot drift apart. */
+  function stackedWeeks(container, weeks, groups, vars) {
     container.textContent = '';
     if (!weeks.length) return;
 
@@ -109,7 +111,7 @@
         const h = Math.max(1, yBot - yTop - (acc > 0 ? 2 : 0));
         const rect = el('rect', {
           x: cx - barW / 2, y: yTop, width: barW, height: h, rx: 3,
-        }, `fill:var(--series-${gi + 1})`);
+        }, `fill:var(${(vars && vars[gi]) || `--series-${gi + 1}`})`);
         bindTip(rect, `${wk.label} · ${g}: ${fmt1(v)} h`);
         svg.appendChild(rect);
         acc += v;
@@ -149,8 +151,10 @@
   }
 
   /* ── 2. Lag distribution: horizontal bars, ordinal ramp ────────────────── */
-  /* rows: [{ bucket, count }] in fixed order; cutAfter = index of last "prompt" bucket */
-  function lagPanel(container, rows, cutAfter) {
+  /* rows: [{ bucket, count }] in fixed order; cutAfter = index of last "prompt" bucket
+     ramp: optional CSS custom-property prefix, e.g. '--lagteal', so the two mode
+     panels can carry the same hue as their mode does everywhere else. */
+  function lagPanel(container, rows, cutAfter, ramp) {
     container.textContent = '';
     const total = rows.reduce((s, r) => s + r.count, 0);
 
@@ -180,7 +184,7 @@
       if (w > 0) {
         const bar = el('rect',
           { x: labelW, y: yTop + 4, width: w, height: rowH - 14, rx: 4 },
-          `fill:var(--lag-${i + 1})`);
+          `fill:var(${ramp || '--lag'}-${i + 1})`);
         bindTip(bar,
           `${r.bucket}: ${r.count} appointment${r.count === 1 ? '' : 's'} · ${pct(r.count, total)}% of ${total}`);
         svg.appendChild(bar);
