@@ -11,7 +11,7 @@ Technicians enter how they spent their time and appointment lag time at the end 
 ## The PIN
 Enter your assigned PIN to advance past the landing page. This should only have to be done once unless cookies are cleared or a different browser is used. This is not Fort Knox; the PIN is only there so technician names aren't stored or transmitted publicly and to prevent a non-technician who might get the URL from seeing the data.
 
-*PINs will be shared via secure email.*
+*Your PIN is xxxxx.*
 
 ## The Actions
 ### 1 - Hours
